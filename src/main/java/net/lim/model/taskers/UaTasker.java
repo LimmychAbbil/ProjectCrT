@@ -9,10 +9,7 @@ import org.jsoup.nodes.Element;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.core.Response;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -80,5 +77,13 @@ public class UaTasker implements Tasker {
                 valueMap.put(text.substring(0, text.indexOf("/")), Double.valueOf(text.split(" ")[1]));
             }
         }
+    }
+
+    @Override
+    public Set<String> getCryptoKeys() {
+        if (valueMap == null || valueMap.isEmpty()) {
+            return Collections.emptySet();
+        }
+        return valueMap.keySet();
     }
 }

@@ -3,7 +3,7 @@ plugins {
 }
 
 group 'net.lim'
-version '0.01a'
+version '0.01b'
 
 repositories {
     mavenCentral()
@@ -11,6 +11,7 @@ repositories {
 
 dependencies {
     compile group: 'org.telegram', name: 'telegrambots', version: '5.0.1.1'
+    implementation group: 'org.telegram', name: 'telegrambotsextensions', version: '5.0.1.1'
     compile group: 'org.projectlombok', name: 'lombok', version: '1.18.12'
     compile group: 'org.glassfish.jersey.core', name: 'jersey-client', version: '2.33'
     compile group: 'org.glassfish.jersey.inject', name: 'jersey-hk2', version: '2.33'
