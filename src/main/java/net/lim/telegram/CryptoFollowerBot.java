@@ -3,6 +3,7 @@ package net.lim.telegram;
 import lombok.extern.slf4j.Slf4j;
 import net.lim.model.SubscriberImpl;
 import net.lim.model.Task;
+import net.lim.model.TaskBuilder;
 import net.lim.model.taskers.Tasker;
 import net.lim.model.taskers.UaTasker;
 import org.telegram.telegrambots.extensions.bots.commandbot.TelegramLongPollingCommandBot;
@@ -20,12 +21,16 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 public class CryptoFollowerBot extends TelegramLongPollingCommandBot {
     private static Tasker observer;
     private static CryptoFollowerBot instance;
+    private Map<Long, TaskBuilder> taskBuilderMap = new HashMap<>();
+
 
     @Override
     public String getBotToken() {
@@ -35,17 +40,71 @@ public class CryptoFollowerBot extends TelegramLongPollingCommandBot {
     @Override
     public void processNonCommandUpdate(Update update) {
         Message message = update.getMessage();
-        System.out.println(message.isCommand());
-        //TODO if regex matches command - process, else - construct from several messages
-        Task taskFromMessage = Task.fromString(message);
-        if (taskFromMessage != null) {
-            sendMsg(update.getMessage().getChatId().toString(), "OK. Following for " + taskFromMessage.getCrCode() + " price.");
-            observer.registerSubscriber(new SubscriberImpl(taskFromMessage));
+        if (TaskBuilder.isMessageAPattern(message)) {
+            Task taskFromMessage = TaskBuilder.fromString(message);
+            if (taskFromMessage != null) {
+                sendMsg(update.getMessage().getChatId().toString(), "OK. Following for " + taskFromMessage.getCrCode() + " price.");
+                observer.registerSubscriber(new SubscriberImpl(taskFromMessage));
+            } else {
+                sendMsg(update.getMessage().getChatId().toString(), "Error, request message should be CRCOD <price>+/-");
+            }
+        } else if (taskBuilderMap.get(update.getMessage().getChatId()) == null && observer.getCryptoKeys().contains(message.getText().toUpperCase())){
+            TaskBuilder taskBuilder = new TaskBuilder();
+            taskBuilder.withCrCode(message.getText().toUpperCase());
+            taskBuilderMap.put(update.getMessage().getChatId(), taskBuilder);
+            sendMsg(update.getMessage().getChatId().toString(), "OK. Continue creating new task. Print desired value in UAH");
         } else {
-            sendMsg(update.getMessage().getChatId().toString(), "Error, request message should be CRCOD <price>+/-");
+            TaskBuilder taskBuilder = taskBuilderMap.get(update.getMessage().getChatId());
+            if (taskBuilder != null && taskBuilder.isReady()) {
+                Task task = taskBuilder.build();
+                if (task != null) {
+                    sendMsg(update.getMessage().getChatId().toString(), "OK. Following for " + task.getCrCode() + " price.");
+                    observer.registerSubscriber(new SubscriberImpl(task));
+                    taskBuilderMap.remove(update.getMessage().getChatId());
+                } else {
+                    sendMsg(update.getMessage().getChatId().toString(), "Error, can't create a new task");
+                }
+            } else {
+                if ("+".equals(update.getMessage().getText()) || "-".equals(update.getMessage().getText())) {
+                    taskBuilder.withPlusOrMinus("+".equals(update.getMessage().getText()));
+                    sendMsg(update.getMessage().getChatId().toString(), "OK, continue.");
+                } else {
+                    try {
+                        Double desiredValue = Double.parseDouble(update.getMessage().getText());
+                        taskBuilder.withDesiredValue(desiredValue);
+                        ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
+                        // Create the keyboard (list of keyboard rows)
+                        List<KeyboardRow> keyboard = new ArrayList<>();
+
+
+                        // Create a keyboard row
+                        KeyboardRow row = new KeyboardRow();
+                        row.add("+");
+                        row.add("-");
+
+                        keyboard.add(row);
+                        keyboardMarkup.setKeyboard(keyboard);
+                        keyboardMarkup.setOneTimeKeyboard(true);
+
+                        SendMessage messageReply = new SendMessage();
+                        messageReply.setChatId(message.getChat().getId().toString());
+                        messageReply.setReplyMarkup(keyboardMarkup);
+
+                        messageReply.setText("OK, if everything is done - print anything");
+                        execute(messageReply);
+
+                    } catch (NumberFormatException e) {
+                        sendMsg(update.getMessage().getChatId().toString(), "Error, can't create a new task: desired value is not a number");
+                    } catch (TelegramApiException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
         }
 
+
     }
+
 
     private synchronized void sendMsg(String chatId, String s) {
         SendMessage sendMessage = new SendMessage();
@@ -112,6 +171,7 @@ public class CryptoFollowerBot extends TelegramLongPollingCommandBot {
                 }
                 // Set the keyboard to the markup
                 keyboardMarkup.setKeyboard(keyboard);
+                keyboardMarkup.setOneTimeKeyboard(true);
                 // Add it to the message
                 message.setReplyMarkup(keyboardMarkup);
 
