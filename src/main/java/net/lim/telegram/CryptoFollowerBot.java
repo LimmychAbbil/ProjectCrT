@@ -50,6 +50,7 @@ public class CryptoFollowerBot extends TelegramLongPollingCommandBot {
             }
         } else if (taskBuilderMap.get(update.getMessage().getChatId()) == null && observer.getCryptoKeys().contains(message.getText().toUpperCase())){
             TaskBuilder taskBuilder = new TaskBuilder();
+            taskBuilder.withTaskAuthor(update.getMessage().getChatId());
             taskBuilder.withCrCode(message.getText().toUpperCase());
             taskBuilderMap.put(update.getMessage().getChatId(), taskBuilder);
             sendMsg(update.getMessage().getChatId().toString(), "OK. Continue creating new task. Print desired value in UAH");

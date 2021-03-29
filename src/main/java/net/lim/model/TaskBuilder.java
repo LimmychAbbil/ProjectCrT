@@ -9,6 +9,12 @@ public class TaskBuilder {
     private String crCode;
     private Double desiredValue;
     private Boolean greater;
+    private Long taskAuthorId;
+
+    public TaskBuilder withTaskAuthor(Long taskAuthorId) {
+        this.taskAuthorId = taskAuthorId;
+        return this;
+    }
 
     public TaskBuilder withCrCode(String crCode) {
         this.crCode = crCode;
@@ -31,7 +37,7 @@ public class TaskBuilder {
 
     public Task build() {
         if (!isReady()) return null;
-        return new Task(crCode, desiredValue, greater);
+        return new Task(crCode, desiredValue, greater, taskAuthorId);
     }
 
     public static Task fromString(Message message) {

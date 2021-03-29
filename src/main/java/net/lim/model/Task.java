@@ -22,6 +22,11 @@ public class Task {
         this.great = great;
     }
 
+    Task(String crCode, double desiredValue, boolean great, Long taskAuthorId) {
+        this(crCode, desiredValue, great);
+        setTaskAuthorId(taskAuthorId);
+    }
+
 
     @Override
     public String toString() {
