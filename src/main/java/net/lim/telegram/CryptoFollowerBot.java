@@ -1,6 +1,7 @@
 package net.lim.telegram;
 
 import lombok.extern.slf4j.Slf4j;
+import net.lim.Application;
 import net.lim.model.SubscriberImpl;
 import net.lim.model.Task;
 import net.lim.model.TaskBuilder;
@@ -27,10 +28,14 @@ import java.util.Map;
 
 @Slf4j
 public class CryptoFollowerBot extends TelegramLongPollingCommandBot {
-    private static Tasker observer;
-    private static CryptoFollowerBot instance;
+
     private Map<Long, TaskBuilder> taskBuilderMap = new HashMap<>();
 
+    private Tasker observer;
+
+    public CryptoFollowerBot(Tasker observer) {
+        this.observer = observer;
+    }
 
     @Override
     public String getBotToken() {
@@ -102,12 +107,9 @@ public class CryptoFollowerBot extends TelegramLongPollingCommandBot {
                 }
             }
         }
-
-
     }
 
-
-    private synchronized void sendMsg(String chatId, String s) {
+    public synchronized void sendMsg(String chatId, String s) {
         SendMessage sendMessage = new SendMessage();
         sendMessage.enableMarkdown(true);
         sendMessage.setChatId(chatId);
@@ -120,25 +122,9 @@ public class CryptoFollowerBot extends TelegramLongPollingCommandBot {
         }
     }
 
-    public static void sendMsg(Long authorId, String message) {
-        instance.sendMsg(authorId.toString(), message);
-    }
-
     @Override
     public String getBotUsername() {
         return "CryptoFollowerBot";
-    }
-
-    public static void main(String[] args) {
-        instance = new CryptoFollowerBot();
-        observer = new UaTasker();
-        new Thread(observer).start();
-        try {
-            TelegramBotsApi telegramBotsApi = new TelegramBotsApi(DefaultBotSession.class);
-            telegramBotsApi.registerBot(new CryptoFollowerBot());
-        } catch (TelegramApiException e) {
-            e.printStackTrace();
-        }
     }
 
     @Override
@@ -187,9 +173,18 @@ public class CryptoFollowerBot extends TelegramLongPollingCommandBot {
         register(new BotCommand("start", "") {
             @Override
             public void execute(AbsSender absSender, User user, Chat chat, String[] arguments) {
-                sendMsg(chat.getId(),
+                Application.sendTelegramMsg(chat.getId(),
                         "You can subscribe for a crypto value on btc-trade.com.ua. Request code is CRCOD <price>+/-" +
                                 "\nIn example: BTC 150000.05+");
+            }
+        });
+
+        register(new BotCommand("about", "Bot version, contacts") {
+            @Override
+            public void execute(AbsSender absSender, User user, Chat chat, String[] arguments) {
+                Application.sendTelegramMsg(chat.getId(),
+                        "CryptoFollewerBot version 0.01e (under development).\n The default into-time is 5 minutes.\n" +
+                                "Any collaboration/contribution appreciated: https://github.com/LimmychAbbil/ProjectCrT");
             }
         });
     }

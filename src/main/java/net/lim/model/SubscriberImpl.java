@@ -1,5 +1,6 @@
 package net.lim.model;
 
+import net.lim.Application;
 import net.lim.telegram.CryptoFollowerBot;
 
 import java.util.Map;
@@ -36,7 +37,7 @@ public class SubscriberImpl implements Subscriber {
         String message = "Current value is: " + cryptoMap.get(task.getCrCode());
         System.out.println("Task " + task + " completed. " + message);
         if (task.getTaskAuthorId() != null) {
-            CryptoFollowerBot.sendMsg(task.getTaskAuthorId(), message);
+            Application.sendTelegramMsg(task.getTaskAuthorId(), message);
         }
     }
 }
