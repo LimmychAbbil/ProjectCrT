@@ -11,11 +11,10 @@ import org.telegram.telegrambots.extensions.bots.commandbot.TelegramLongPollingC
 import org.telegram.telegrambots.extensions.bots.commandbot.commands.BotCommand;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import org.telegram.telegrambots.meta.api.objects.Chat;
-import org.telegram.telegrambots.meta.api.objects.Message;
-import org.telegram.telegrambots.meta.api.objects.Update;
-import org.telegram.telegrambots.meta.api.objects.User;
+import org.telegram.telegrambots.meta.api.objects.*;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.meta.bots.AbsSender;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
@@ -45,6 +44,10 @@ public class CryptoFollowerBot extends TelegramLongPollingCommandBot {
     @Override
     public void processNonCommandUpdate(Update update) {
         Message message = update.getMessage();
+        if (message == null && update.hasCallbackQuery()) {
+            processInlineButtonPressed(update);
+            return; //FIXME
+        }
         if (TaskBuilder.isMessageAPattern(message)) {
             Task taskFromMessage = TaskBuilder.fromString(message);
             if (taskFromMessage != null) {
@@ -73,30 +76,15 @@ public class CryptoFollowerBot extends TelegramLongPollingCommandBot {
             } else {
                 if ("+".equals(update.getMessage().getText()) || "-".equals(update.getMessage().getText())) {
                     taskBuilder.withPlusOrMinus("+".equals(update.getMessage().getText()));
-                    sendMsg(update.getMessage().getChatId().toString(), "OK, continue.");
+                    sendMsg(update.getMessage().getChatId().toString(), "Task ready. Print anything to subscribe"); //TODO a message to review + confirm/cancel
                 } else {
                     try {
                         Double desiredValue = Double.parseDouble(update.getMessage().getText());
                         taskBuilder.withDesiredValue(desiredValue);
-                        ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
-                        // Create the keyboard (list of keyboard rows)
-                        List<KeyboardRow> keyboard = new ArrayList<>();
-
-
-                        // Create a keyboard row
-                        KeyboardRow row = new KeyboardRow();
-                        row.add("+");
-                        row.add("-");
-
-                        keyboard.add(row);
-                        keyboardMarkup.setKeyboard(keyboard);
-                        keyboardMarkup.setOneTimeKeyboard(true);
 
                         SendMessage messageReply = new SendMessage();
                         messageReply.setChatId(message.getChat().getId().toString());
-                        messageReply.setReplyMarkup(keyboardMarkup);
-
-                        messageReply.setText("OK, if everything is done - print anything");
+                        messageReply.setText("Print +/- to set the corner value side reached to inform"); //TODO add + and - inline buttons
                         execute(messageReply);
 
                     } catch (NumberFormatException e) {
@@ -107,6 +95,16 @@ public class CryptoFollowerBot extends TelegramLongPollingCommandBot {
                 }
             }
         }
+    }
+
+    private void processInlineButtonPressed(Update update) {
+        Long author = update.getCallbackQuery().getFrom().getId();
+        String buttonPressed = update.getCallbackQuery().getData();
+        TaskBuilder taskBuilder = new TaskBuilder();
+        taskBuilder.withTaskAuthor(author);
+        taskBuilder.withCrCode(buttonPressed.toUpperCase());
+        taskBuilderMap.put(author, taskBuilder);
+        Application.sendTelegramMsg(author, "Print the corner UAH value of the " + buttonPressed + " coin (as a digit, i.e. 1.35)");
     }
 
     public synchronized void sendMsg(String chatId, String s) {
@@ -130,27 +128,29 @@ public class CryptoFollowerBot extends TelegramLongPollingCommandBot {
     @Override
     public void onRegister() {
         register(new BotCommand("info", "Show bot usage") {
-            @Override
+            @Override //262538555
             public void execute(AbsSender absSender, User user, Chat chat, String[] arguments) {
                 SendMessage message = new SendMessage();
                 message.setChatId(chat.getId().toString());
                 message.setText("Select the crypto currency to follow price");
 
                 // Create ReplyKeyboardMarkup object
-                ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
+                InlineKeyboardMarkup keyboardMarkup = new InlineKeyboardMarkup();
                 // Create the keyboard (list of keyboard rows)
-                List<KeyboardRow> keyboard = new ArrayList<>();
+                List<List<InlineKeyboardButton>> keyboard = new ArrayList<>();
 
 
                 // Create a keyboard row
-                KeyboardRow row = new KeyboardRow();
+                List<InlineKeyboardButton> row = new ArrayList<>();
 
                 for (String key : observer.getCryptoKeys()) {
-                    row.add(key);
-
+                    InlineKeyboardButton button = new InlineKeyboardButton(key);
+                    button.setCallbackData(key);
+                    button.setSwitchInlineQueryCurrentChat(key);
+                    row.add(button);
                     if (row.size() == 5) {
                         keyboard.add(row);
-                        row = new KeyboardRow();
+                        row = new ArrayList<>();
                     }
                 }
                 if (!row.isEmpty()) {
@@ -158,7 +158,6 @@ public class CryptoFollowerBot extends TelegramLongPollingCommandBot {
                 }
                 // Set the keyboard to the markup
                 keyboardMarkup.setKeyboard(keyboard);
-                keyboardMarkup.setOneTimeKeyboard(true);
                 // Add it to the message
                 message.setReplyMarkup(keyboardMarkup);
 
@@ -183,7 +182,7 @@ public class CryptoFollowerBot extends TelegramLongPollingCommandBot {
             @Override
             public void execute(AbsSender absSender, User user, Chat chat, String[] arguments) {
                 Application.sendTelegramMsg(chat.getId(),
-                        "CryptoFollewerBot version 0.01e (under development).\n The default into-time is 5 minutes.\n" +
+                        "CryptoFollewerBot version 0.01f (under development).\n The default into-time is 5 minutes.\n" +
                                 "Any collaboration/contribution appreciated: https://github.com/LimmychAbbil/ProjectCrT");
             }
         });
