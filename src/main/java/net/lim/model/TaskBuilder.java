@@ -42,7 +42,7 @@ public class TaskBuilder {
 
     public static Task fromString(Message message) {
         String request = message.getText();
-        if (isMessageAPattern(message)) {
+        if (isMessageAPattern(request)) {
             Task newTask = new Task(request.split(" ")[0],
                     Double.parseDouble(request.substring(request.indexOf(" ") + 1, request.length() - 1)
                             .replace(",", ".")),
@@ -54,10 +54,10 @@ public class TaskBuilder {
         }
     }
 
-    public static boolean isMessageAPattern(Message message) {
+    public static boolean isMessageAPattern(String message) {
         String pattern = Task.FULL_TASK_PATTERN;
         Pattern p = Pattern.compile(pattern);
-        Matcher m = p.matcher(message.getText());
+        Matcher m = p.matcher(message);
         return m.matches();
     }
 }
