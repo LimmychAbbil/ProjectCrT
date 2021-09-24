@@ -10,7 +10,7 @@ public class AboutCommand extends BotCommand {
     @Override
     public void execute(AbsSender absSender, User user, Chat chat, String[] arguments) {
         Application.sendTelegramMsg(chat.getId(),
-                "CryptoFollewerBot version 0.01h (under development).\n The default into-time is 5 minutes.\n" +
+                "CryptoFollewerBot version 0.01i (under development).\n The default into-time is 5 minutes.\n" +
                         "Any collaboration/contribution appreciated: https://github.com/LimmychAbbil/ProjectCrT");
     }
 

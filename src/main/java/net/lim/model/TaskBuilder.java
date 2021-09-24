@@ -21,22 +21,35 @@ public class TaskBuilder {
         return this;
     }
 
+    /**
+     *
+     * @param desiredValue
+     * @return null if not crCode specified yet. Or return a TaskBuilder with crCode and DesiredValue
+     */
     public TaskBuilder withDesiredValue(double desiredValue) {
+        if (this.crCode == null) return null;
         this.desiredValue = desiredValue;
         return this;
     }
 
-    public TaskBuilder withPlusOrMinus(boolean greater) {
+    /**
+     *
+     * @param greater
+     * @return null if task is not ready to subscribe. Or return a ready task
+     */
+    public Task withPlusOrMinus(boolean greater) {
         this.greater = greater;
-        return this;
+        if (notReady()) return null;
+        return new Task(crCode, desiredValue, greater, taskAuthorId);
     }
 
-    public boolean isReady() {
-        return crCode != null && desiredValue != null && greater != null;
+    private boolean notReady() {
+        return crCode == null || desiredValue == null || greater == null;
     }
 
+    @Deprecated
     public Task build() {
-        if (!isReady()) return null;
+        if (notReady()) return null;
         return new Task(crCode, desiredValue, greater, taskAuthorId);
     }
 
