@@ -2,12 +2,14 @@ package net.lim.telegram;
 
 import lombok.extern.slf4j.Slf4j;
 import net.lim.Application;
+import net.lim.model.Subscriber;
 import net.lim.model.SubscriberImpl;
 import net.lim.model.Task;
 import net.lim.model.TaskBuilder;
 import net.lim.model.taskers.Tasker;
 import net.lim.telegram.commands.AboutCommand;
 import net.lim.telegram.commands.InfoCommand;
+import net.lim.telegram.commands.ListCommand;
 import net.lim.telegram.commands.StartCommand;
 import org.telegram.telegrambots.extensions.bots.commandbot.TelegramLongPollingCommandBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -65,7 +67,9 @@ public class CryptoFollowerBot extends TelegramLongPollingCommandBot {
             Task task = taskBuilder.withPlusOrMinus("+".equals(buttonPressed));
             if (task != null) {
                 sendMsg(author.toString(), "OK. Following for " + task.getCrCode() + " price.");
-                observer.registerSubscriber(new SubscriberImpl(task));
+                Subscriber subscriber = SubscriberImpl.getSubscriber(author);
+                subscriber.addTask(task);
+                observer.registerSubscriber(subscriber);
                 taskBuilderMap.remove(author);
             }
         }
@@ -116,7 +120,9 @@ public class CryptoFollowerBot extends TelegramLongPollingCommandBot {
         Task taskFromMessage = TaskBuilder.fromString(message);
         if (taskFromMessage != null) {
             sendMsg(message.getChatId().toString(), "OK. Following for " + taskFromMessage.getCrCode() + " price.");
-            observer.registerSubscriber(new SubscriberImpl(taskFromMessage));
+            Subscriber subscriber = SubscriberImpl.getSubscriber(message.getChatId());
+            subscriber.addTask(taskFromMessage);
+            observer.registerSubscriber(subscriber);
         } else {
             sendMsg(message.getChatId().toString(), "Error, request message should be CRCOD <price>+/-");
         }
@@ -140,5 +146,6 @@ public class CryptoFollowerBot extends TelegramLongPollingCommandBot {
         register(new InfoCommand(this, observer, "info", "Show bot usage"));
         register(new StartCommand("start", ""));
         register(new AboutCommand("about", "Bot version, contacts"));
+        register(new ListCommand("list", "Print list "));
     }
 }
