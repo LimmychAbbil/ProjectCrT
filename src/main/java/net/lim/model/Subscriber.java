@@ -1,5 +1,6 @@
 package net.lim.model;
 
+import java.util.List;
 import java.util.Map;
 
 public interface Subscriber {
@@ -7,5 +8,6 @@ public interface Subscriber {
 
     void addTask(Task task);
     void removeTasks(String crCode);
+    List<Task> tasksList();
 
 }

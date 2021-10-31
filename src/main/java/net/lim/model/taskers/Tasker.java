@@ -8,6 +8,7 @@ import java.util.Set;
 public interface Tasker extends Runnable {
     void registerSubscriber(Subscriber o);
     void removeSubscriber(Subscriber o);
+
     void notifyObservers();
 
     void saveUpdates(Map<String, Double> map);

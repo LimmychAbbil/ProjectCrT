@@ -23,17 +23,12 @@ public class SubscriberImpl implements Subscriber {
     private static Map<Long, Subscriber> subscribers = new HashMap<>();
 
     public static Subscriber getSubscriber(Long subscriberId) {
-        Subscriber subscriber = null;
-        if (subscribers.get(subscriberId) == null) {
+        Subscriber subscriber = subscribers.get(subscriberId);
+        if (subscriber == null) {
             subscriber = new SubscriberImpl(subscriberId);
             subscribers.put(subscriberId, subscriber);
         }
         return subscriber;
-    }
-
-    private SubscriberImpl(Task task) {
-        this(task.getTaskAuthorId());
-        taskList.add(task);
     }
 
     private SubscriberImpl(Long subscriberId) {
@@ -62,6 +57,11 @@ public class SubscriberImpl implements Subscriber {
         taskList.removeAll(taskList.stream().filter(t -> crCode.equalsIgnoreCase(t.getCrCode())).collect(Collectors.toList()));
     }
 
+    @Override
+    public List<Task> tasksList() {
+        return taskList;
+    }
+
     private boolean isValueReached(Task task) {
         Double currentValue = cryptoMap.get(task.getCrCode());
         if (currentValue == null) {
@@ -76,7 +76,7 @@ public class SubscriberImpl implements Subscriber {
 
     private void display(Task task) {
         String message = "Current value is: " + cryptoMap.get(task.getCrCode());
-        System.out.println("Task " + taskList + " completed. " + message);
+        log.info("Task " + taskList + " completed. " + message);
         if (task.getTaskAuthorId() != null) {
             Application.sendTelegramMsg(task.getTaskAuthorId(), message);
         }

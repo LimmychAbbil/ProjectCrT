@@ -72,9 +72,14 @@ public class UaTasker implements Tasker {
         List<Element> crMapElements = crMapElement.child(0).children().stream().filter(element -> element.hasClass("overview")).collect(Collectors.toList());
 
         for (Element e : crMapElements) {
-            String text = e.getElementsByTag("a").get(0).text();
-            if (text.contains("UAH")) {
-                valueMap.put(text.substring(0, text.indexOf("/")), Double.valueOf(text.split(" ")[1]));
+            try {
+                String text = e.getElementsByTag("a").get(0).text();
+                if (text.contains("UAH")) {
+                    valueMap.put(text.substring(0, text.indexOf("/")), Double.valueOf(text.split(" ")[1]));
+                }
+            } catch (NumberFormatException ex) {
+                log.warn("Can't parse " + e.text() + ". " + ex.getMessage());
+                continue;
             }
         }
     }

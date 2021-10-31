@@ -1,19 +1,58 @@
 package net.lim.telegram.commands;
 
 import net.lim.Application;
+import net.lim.model.Subscriber;
+import net.lim.model.SubscriberImpl;
+import net.lim.model.taskers.Tasker;
+import net.lim.telegram.CryptoFollowerBot;
+import org.telegram.telegrambots.extensions.bots.commandbot.TelegramLongPollingCommandBot;
 import org.telegram.telegrambots.extensions.bots.commandbot.commands.BotCommand;
+import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Chat;
 import org.telegram.telegrambots.meta.api.objects.User;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.bots.AbsSender;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class ListCommand extends BotCommand {
 
-    public ListCommand(String commandIdentifier, String description) {
+    //FIXME do not pass entry bot class to the commands
+    private final CryptoFollowerBot bot;
+
+    public ListCommand(CryptoFollowerBot cryptoFollowerBot, String commandIdentifier, String description) {
         super(commandIdentifier, description);
+        this.bot = cryptoFollowerBot;
     }
 
     @Override
     public void execute(AbsSender absSender, User user, Chat chat, String[] arguments) {
         Application.sendTelegramMsg(user.getId(), "Here would be a list of tasks for subscriber " + user.getId());
+        Subscriber subscriber = SubscriberImpl.getSubscriber(user.getId());
+        subscriber.tasksList().forEach(task -> {
+            SendMessage messageReply = new SendMessage();
+            messageReply.setChatId(chat.getId().toString());
+            messageReply.setText("The subscribe for " + task.getCrCode() + " coin to reach " + task.getDesiredValue() + (task.isGreat() ? "+" : "-"));
+            List<InlineKeyboardButton> buttonRow = new ArrayList<>();
+            InlineKeyboardButton checkButton = new InlineKeyboardButton("Check the price"); //TODO emoji
+            checkButton.setCallbackData("TASK:CHECK");
+            InlineKeyboardButton editButton = new InlineKeyboardButton("Edit task"); //TODO emoji
+            editButton.setCallbackData("TASK:EDIT");
+            InlineKeyboardButton deleteButton = new InlineKeyboardButton("Delete task"); //TODO emoji
+            deleteButton.setCallbackData("TASK:DELETE");
+            buttonRow.add(checkButton);
+            buttonRow.add(editButton);
+            buttonRow.add(deleteButton);
+            messageReply.setReplyMarkup(new InlineKeyboardMarkup(Collections.singletonList(buttonRow)));
+            try {
+                bot.execute(messageReply);
+            } catch (TelegramApiException e) {
+                e.printStackTrace(); //TODO handle exception in the bot execute() method
+            }
+        });
     }
 }

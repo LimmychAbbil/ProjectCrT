@@ -34,7 +34,7 @@ public class CryptoFollowerBot extends TelegramLongPollingCommandBot {
 
     @Override
     public String getBotToken() {
-        return "";
+        return ""; //TODO read from config file
     }
 
     @Override
@@ -146,6 +146,6 @@ public class CryptoFollowerBot extends TelegramLongPollingCommandBot {
         register(new InfoCommand(this, observer, "info", "Show bot usage"));
         register(new StartCommand("start", ""));
         register(new AboutCommand("about", "Bot version, contacts"));
-        register(new ListCommand("list", "Print list "));
+        register(new ListCommand(this, "list", "Print list "));
     }
 }

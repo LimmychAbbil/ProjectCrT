@@ -3,7 +3,7 @@ plugins {
 }
 
 group 'net.lim'
-version '0.01j'
+version '0.02a'
 
 repositories {
     mavenCentral()
