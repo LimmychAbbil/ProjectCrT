@@ -1,4 +1,5 @@
 *.class
+*.token
 .idea/
 .gradle/
 gradlew

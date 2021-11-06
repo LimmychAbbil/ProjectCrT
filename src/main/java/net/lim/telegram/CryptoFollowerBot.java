@@ -34,7 +34,7 @@ public class CryptoFollowerBot extends TelegramLongPollingCommandBot {
 
     @Override
     public String getBotToken() {
-        return ""; //TODO read from config file
+        return TokenReader.getBotToken();
     }
 
     @Override
