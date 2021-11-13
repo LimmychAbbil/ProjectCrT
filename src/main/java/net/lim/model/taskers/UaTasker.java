@@ -19,14 +19,12 @@ public class UaTasker implements Tasker {
     private volatile boolean isRunning = false;
     private static final int TIMEOUT = 5 * 60 * 1000; //5 min
 
-    private List<Subscriber> subscribers = new ArrayList<>();
+    private final Set<Subscriber> subscribers = new HashSet<>();
     private Map<String,Double> valueMap = new HashMap<>();
 
     @Override
     public void registerSubscriber(Subscriber o) {
-        if (!subscribers.contains(o)) {
-            subscribers.add(o);
-        }
+        subscribers.add(o);
         o.update(valueMap);
     }
 

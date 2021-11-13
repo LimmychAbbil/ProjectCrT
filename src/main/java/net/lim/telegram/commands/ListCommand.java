@@ -31,18 +31,18 @@ public class ListCommand extends BotCommand {
 
     @Override
     public void execute(AbsSender absSender, User user, Chat chat, String[] arguments) {
-        Application.sendTelegramMsg(user.getId(), "Here would be a list of tasks for subscriber " + user.getId());
+        Application.sendTelegramMsg(user.getId(), "List of tasks for subscriber " + user.getId());
         Subscriber subscriber = SubscriberImpl.getSubscriber(user.getId());
         subscriber.tasksList().forEach(task -> {
             SendMessage messageReply = new SendMessage();
             messageReply.setChatId(chat.getId().toString());
             messageReply.setText("The subscribe for " + task.getCrCode() + " coin to reach " + task.getDesiredValue() + (task.isGreat() ? "+" : "-"));
             List<InlineKeyboardButton> buttonRow = new ArrayList<>();
-            InlineKeyboardButton checkButton = new InlineKeyboardButton("Check the price"); //TODO emoji
+            InlineKeyboardButton checkButton = new InlineKeyboardButton("\uD83D\uDC40");
             checkButton.setCallbackData("TASK:CHECK");
-            InlineKeyboardButton editButton = new InlineKeyboardButton("Edit task"); //TODO emoji
+            InlineKeyboardButton editButton = new InlineKeyboardButton("\uD83D\uDD8A");
             editButton.setCallbackData("TASK:EDIT");
-            InlineKeyboardButton deleteButton = new InlineKeyboardButton("Delete task"); //TODO emoji
+            InlineKeyboardButton deleteButton = new InlineKeyboardButton("\u274C");
             deleteButton.setCallbackData("TASK:DELETE");
             buttonRow.add(checkButton);
             buttonRow.add(editButton);

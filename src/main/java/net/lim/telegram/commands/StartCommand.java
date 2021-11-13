@@ -16,6 +16,9 @@ public class StartCommand extends BotCommand {
     public void execute(AbsSender absSender, User user, Chat chat, String[] arguments) {
         Application.sendTelegramMsg(chat.getId(),
                 "You can subscribe for a crypto value on btc-trade.com.ua. Request code is CRCOD <price>+/-" +
-                        "\nIn example: BTC 150000.05+");
+                        "\nIn example: BTC 150000.05+\n" +
+                        "Use /about to print the information\n" +
+                        "Use /info to start the new task with hints\n" +
+                        "Use /list to check your active tasks");
     }
 }
