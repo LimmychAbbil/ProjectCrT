@@ -1,5 +1,7 @@
 package net.lim.model;
 
+import net.lim.model.task.Task;
+
 import java.util.List;
 import java.util.Map;
 

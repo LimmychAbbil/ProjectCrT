@@ -1,4 +1,4 @@
-package net.lim.model;
+package net.lim.model.task;
 
 import org.telegram.telegrambots.meta.api.objects.Message;
 

@@ -4,8 +4,9 @@ import lombok.extern.slf4j.Slf4j;
 import net.lim.Application;
 import net.lim.model.Subscriber;
 import net.lim.model.SubscriberImpl;
-import net.lim.model.Task;
-import net.lim.model.TaskBuilder;
+import net.lim.model.task.Task;
+import net.lim.model.task.TaskBuilder;
+import net.lim.model.task.TaskHandler;
 import net.lim.model.taskers.Tasker;
 import net.lim.telegram.commands.AboutCommand;
 import net.lim.telegram.commands.InfoCommand;
@@ -56,6 +57,10 @@ public class CryptoFollowerBot extends TelegramLongPollingCommandBot {
     private void processInlineButtonPressed(Update update) {
         Long author = update.getCallbackQuery().getFrom().getId();
         String buttonPressed = update.getCallbackQuery().getData();
+        if (isTaskHandlerButton(buttonPressed)) {
+            TaskHandler.handleTaskButtonPressed(author, buttonPressed);
+            return;
+        }
         if (taskBuilderMap.get(author) == null) {
             TaskBuilder taskBuilder = new TaskBuilder();
             taskBuilder.withTaskAuthor(author);
@@ -73,6 +78,10 @@ public class CryptoFollowerBot extends TelegramLongPollingCommandBot {
                 taskBuilderMap.remove(author);
             }
         }
+    }
+
+    private boolean isTaskHandlerButton(String buttonPressed) {
+        return buttonPressed.startsWith("TASK:");
     }
 
     private void processTextMessage(Message message) {

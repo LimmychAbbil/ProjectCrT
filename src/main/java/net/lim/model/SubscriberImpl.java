@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import net.lim.Application;
+import net.lim.model.task.Task;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -39,7 +40,7 @@ public class SubscriberImpl implements Subscriber {
     @Override
     public void update(Map<String,Double> cryptoMap) {
         this.cryptoMap = cryptoMap;
-        for (Task task : taskList) {
+        for (Task task : taskList) { //FIXME do not notify every task when new created, but still subscribe for main loop
             if (isValueReached(task)) {
                 display(task);
             }

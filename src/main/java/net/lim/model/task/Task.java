@@ -1,4 +1,4 @@
-package net.lim.model;
+package net.lim.model.task;
 
 
 import lombok.Getter;

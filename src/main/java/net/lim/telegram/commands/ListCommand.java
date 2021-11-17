@@ -3,6 +3,7 @@ package net.lim.telegram.commands;
 import net.lim.Application;
 import net.lim.model.Subscriber;
 import net.lim.model.SubscriberImpl;
+import net.lim.model.task.TaskHandler;
 import net.lim.model.taskers.Tasker;
 import net.lim.telegram.CryptoFollowerBot;
 import org.telegram.telegrambots.extensions.bots.commandbot.TelegramLongPollingCommandBot;
@@ -31,7 +32,7 @@ public class ListCommand extends BotCommand {
 
     @Override
     public void execute(AbsSender absSender, User user, Chat chat, String[] arguments) {
-        Application.sendTelegramMsg(user.getId(), "List of tasks for subscriber " + user.getId());
+        Application.sendTelegramMsg(user.getId(), "List of tasks for subscriber " + user.getUserName());
         Subscriber subscriber = SubscriberImpl.getSubscriber(user.getId());
         subscriber.tasksList().forEach(task -> {
             SendMessage messageReply = new SendMessage();
@@ -43,7 +44,7 @@ public class ListCommand extends BotCommand {
             InlineKeyboardButton editButton = new InlineKeyboardButton("\uD83D\uDD8A");
             editButton.setCallbackData("TASK:EDIT");
             InlineKeyboardButton deleteButton = new InlineKeyboardButton("\u274C");
-            deleteButton.setCallbackData("TASK:DELETE");
+            deleteButton.setCallbackData(String.format(TaskHandler.TASK_DELETE_KEY_FORMAT, task.getCrCode(), task.getDesiredValue()));
             buttonRow.add(checkButton);
             buttonRow.add(editButton);
             buttonRow.add(deleteButton);
