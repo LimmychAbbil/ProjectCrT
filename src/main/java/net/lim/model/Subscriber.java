@@ -12,4 +12,5 @@ public interface Subscriber {
     void removeTasks(String crCode);
     List<Task> tasksList();
 
+    Double getLatestUpdateByCrCode(String crCode);
 }

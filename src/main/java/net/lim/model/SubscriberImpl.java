@@ -63,6 +63,10 @@ public class SubscriberImpl implements Subscriber {
         return taskList;
     }
 
+    public Double getLatestUpdateByCrCode(String crCode) {
+        return cryptoMap.get(crCode);
+    }
+
     private boolean isValueReached(Task task) {
         Double currentValue = cryptoMap.get(task.getCrCode());
         if (currentValue == null) {

@@ -40,7 +40,7 @@ public class ListCommand extends BotCommand {
             messageReply.setText("The subscribe for " + task.getCrCode() + " coin to reach " + task.getDesiredValue() + (task.isGreat() ? "+" : "-"));
             List<InlineKeyboardButton> buttonRow = new ArrayList<>();
             InlineKeyboardButton checkButton = new InlineKeyboardButton("\uD83D\uDC40");
-            checkButton.setCallbackData("TASK:CHECK");
+            checkButton.setCallbackData(String.format(TaskHandler.TASK_CHECK_KEY_FORMAT, task.getCrCode()));
             InlineKeyboardButton editButton = new InlineKeyboardButton("\uD83D\uDD8A");
             editButton.setCallbackData("TASK:EDIT");
             InlineKeyboardButton deleteButton = new InlineKeyboardButton("\u274C");
