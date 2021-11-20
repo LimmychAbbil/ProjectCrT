@@ -25,7 +25,7 @@ import java.util.*;
 @Slf4j
 public class CryptoFollowerBot extends TelegramLongPollingCommandBot {
 
-    private final Map<Long, TaskBuilder> taskBuilderMap = new HashMap<>();
+    private static final Map<Long, TaskBuilder> taskBuilderMap = new HashMap<>();
 
     private final Tasker observer;
 
@@ -62,11 +62,7 @@ public class CryptoFollowerBot extends TelegramLongPollingCommandBot {
             return;
         }
         if (taskBuilderMap.get(author) == null) {
-            TaskBuilder taskBuilder = new TaskBuilder();
-            taskBuilder.withTaskAuthor(author);
-            taskBuilder.withCrCode(buttonPressed.toUpperCase());
-            taskBuilderMap.put(author, taskBuilder);
-            Application.sendTelegramMsg(author, "Print the corner UAH value of the " + buttonPressed + " coin (as a digit, i.e. 1.35)");
+            startNewTask(author, buttonPressed);
         } else {
             TaskBuilder taskBuilder = taskBuilderMap.get(author);
             Task task = taskBuilder.withPlusOrMinus("+".equals(buttonPressed));
@@ -78,6 +74,14 @@ public class CryptoFollowerBot extends TelegramLongPollingCommandBot {
                 taskBuilderMap.remove(author);
             }
         }
+    }
+
+    public static void startNewTask(Long author, String buttonPressed) {
+        TaskBuilder taskBuilder = new TaskBuilder();
+        taskBuilder.withTaskAuthor(author);
+        taskBuilder.withCrCode(buttonPressed.toUpperCase());
+        taskBuilderMap.put(author, taskBuilder);
+        Application.sendTelegramMsg(author, "Print the corner UAH value of the " + buttonPressed + " coin (as a digit, i.e. 1.35)");
     }
 
     private boolean isTaskHandlerButton(String buttonPressed) {

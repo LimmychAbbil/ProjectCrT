@@ -10,6 +10,7 @@ public interface Subscriber {
 
     void addTask(Task task);
     void removeTasks(String crCode);
+    void removeTask(String crCode, Double desiredValue, boolean isGreat);
     List<Task> tasksList();
 
     Double getLatestUpdateByCrCode(String crCode);
