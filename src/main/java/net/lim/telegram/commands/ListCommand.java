@@ -42,7 +42,7 @@ public class ListCommand extends BotCommand {
             InlineKeyboardButton checkButton = new InlineKeyboardButton("\uD83D\uDC40");
             checkButton.setCallbackData(String.format(TaskHandler.TASK_CHECK_KEY_FORMAT, task.getCrCode()));
             InlineKeyboardButton editButton = new InlineKeyboardButton("\uD83D\uDD8A");
-            editButton.setCallbackData("TASK:EDIT");
+            editButton.setCallbackData(String.format(TaskHandler.TASK_EDIT_KEY_FORMAT, task.getCrCode(), task.getDesiredValue(), task.isGreat() ? "+" : "-"));
             InlineKeyboardButton deleteButton = new InlineKeyboardButton("\u274C");
             deleteButton.setCallbackData(String.format(TaskHandler.TASK_DELETE_KEY_FORMAT, task.getCrCode(), task.getDesiredValue()));
             buttonRow.add(checkButton);

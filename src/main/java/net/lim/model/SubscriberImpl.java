@@ -6,10 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.lim.Application;
 import net.lim.model.task.Task;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -56,6 +53,11 @@ public class SubscriberImpl implements Subscriber {
     @Override
     public void removeTasks(String crCode) {
         taskList.removeAll(taskList.stream().filter(t -> crCode.equalsIgnoreCase(t.getCrCode())).collect(Collectors.toList()));
+    }
+
+    public void removeTask(String crCode, Double desiredValue, boolean isGreat) {
+        Optional<Task> task = taskList.stream().filter(t -> !crCode.equalsIgnoreCase(t.getCrCode()) || t.getDesiredValue() == desiredValue || t.isGreat() == isGreat).findFirst();
+        task.ifPresent(t -> taskList.remove(t));
     }
 
     @Override
