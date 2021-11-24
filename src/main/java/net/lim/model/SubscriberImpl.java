@@ -12,13 +12,13 @@ import java.util.stream.Collectors;
 @Slf4j
 public class SubscriberImpl implements Subscriber {
     private Map<String,Double> cryptoMap;
-    private List<Task> taskList;
+    private final List<Task> taskList;
 
     @Getter
     @Setter
     private Long subscriberId;
 
-    private static Map<Long, Subscriber> subscribers = new HashMap<>();
+    private final static Map<Long, Subscriber> subscribers = new HashMap<>();
 
     public static Subscriber getSubscriber(Long subscriberId) {
         Subscriber subscriber = subscribers.get(subscriberId);
@@ -35,12 +35,17 @@ public class SubscriberImpl implements Subscriber {
     }
 
     @Override
+    public void checkTask(Task task, Map<String, Double> cryptoMap) {
+        if (isValueReached(task)) {
+            display(task);
+        }
+    }
+
+    @Override
     public void update(Map<String,Double> cryptoMap) {
         this.cryptoMap = cryptoMap;
-        for (Task task : taskList) { //FIXME do not notify every task when new created, but still subscribe for main loop
-            if (isValueReached(task)) {
-                display(task);
-            }
+        for (Task task : taskList) {
+            checkTask(task, cryptoMap);
         }
     }
 
@@ -57,7 +62,7 @@ public class SubscriberImpl implements Subscriber {
 
     public void removeTask(String crCode, Double desiredValue, boolean isGreat) {
         Optional<Task> task = taskList.stream().filter(t -> !crCode.equalsIgnoreCase(t.getCrCode()) || t.getDesiredValue() == desiredValue || t.isGreat() == isGreat).findFirst();
-        task.ifPresent(t -> taskList.remove(t));
+        task.ifPresent(taskList::remove);
     }
 
     @Override

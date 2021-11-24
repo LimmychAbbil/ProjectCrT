@@ -24,8 +24,12 @@ public class UaTasker implements Tasker {
 
     @Override
     public void registerSubscriber(Subscriber o) {
-        subscribers.add(o);
-        o.update(valueMap);
+        if (!subscribers.contains(o)) {
+            subscribers.add(o);
+            o.update(valueMap);
+        } else {
+            o.checkTask(o.tasksList().get(o.tasksList().size() - 1), valueMap);
+        }
     }
 
     @Override
