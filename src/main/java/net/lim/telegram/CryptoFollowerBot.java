@@ -156,9 +156,9 @@ public class CryptoFollowerBot extends TelegramLongPollingCommandBot {
 
     @Override
     public void onRegister() {
-        register(new InfoCommand(this, observer, "info", "Show bot usage"));
+        register(new InfoCommand(observer, "info", "Show bot usage"));
         register(new StartCommand("start", ""));
         register(new AboutCommand("about", "Bot version, contacts"));
-        register(new ListCommand(this, "list", "Print list "));
+        register(new ListCommand("list", "Print list "));
     }
 }

@@ -4,6 +4,7 @@ import net.lim.model.taskers.Tasker;
 import net.lim.model.taskers.UaTasker;
 import net.lim.telegram.CryptoFollowerBot;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
+import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 
@@ -26,5 +27,13 @@ public class Application {
 
     public static void sendTelegramMsg(Long authorId, String message) {
         instance.sendMsg(authorId.toString(), message);
+    }
+
+    public static void sendTelegramMsgWithReply( SendMessage message) {
+        try {
+            instance.execute(message);
+        } catch (TelegramApiException e) {
+            e.printStackTrace();
+        }
     }
 }

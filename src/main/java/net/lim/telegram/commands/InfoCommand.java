@@ -1,7 +1,7 @@
 package net.lim.telegram.commands;
 
+import net.lim.Application;
 import net.lim.model.taskers.Tasker;
-import org.telegram.telegrambots.extensions.bots.commandbot.TelegramLongPollingCommandBot;
 import org.telegram.telegrambots.extensions.bots.commandbot.commands.BotCommand;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Chat;
@@ -9,17 +9,14 @@ import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.bots.AbsSender;
-import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class InfoCommand extends BotCommand {
-    private final TelegramLongPollingCommandBot bot;
     private final Tasker observer;
-    public InfoCommand(TelegramLongPollingCommandBot bot, Tasker observer, String commandIdentifier, String description) {
+    public InfoCommand(Tasker observer, String commandIdentifier, String description) {
         super(commandIdentifier, description);
-        this.bot = bot;
         this.observer = observer;
     }
 
@@ -55,10 +52,6 @@ public class InfoCommand extends BotCommand {
         // Add it to the message
         message.setReplyMarkup(keyboardMarkup);
 
-        try {
-            bot.execute(message);
-        } catch (TelegramApiException e) {
-            e.printStackTrace();
-        }
+        Application.sendTelegramMsgWithReply(message);
     }
 }

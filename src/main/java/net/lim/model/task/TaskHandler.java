@@ -4,7 +4,6 @@ import lombok.extern.slf4j.Slf4j;
 import net.lim.Application;
 import net.lim.model.Subscriber;
 import net.lim.model.SubscriberImpl;
-import net.lim.model.taskers.UaTasker;
 import net.lim.telegram.CryptoFollowerBot;
 
 @Slf4j
@@ -38,7 +37,7 @@ public class TaskHandler {
 
             CryptoFollowerBot.startNewTask(author, cryptoCode);
         } else {
-            Application.sendTelegramMsg(author, "This button is not implemented yet, action ignored"); //TODO
+            log.error("Button " + buttonPressed + " was pressed by " + author + " but not implementation found. Ignoring");
         }
     }
 

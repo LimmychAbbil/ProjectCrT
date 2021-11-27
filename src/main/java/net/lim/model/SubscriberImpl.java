@@ -87,7 +87,7 @@ public class SubscriberImpl implements Subscriber {
     }
 
     private void display(Task task) {
-        String message = "Current value is: " + cryptoMap.get(task.getCrCode());
+        String message = "Current value of " + task.getCrCode() + " is: " + cryptoMap.get(task.getCrCode());
         log.info("Task " + taskList + " completed. " + message);
         if (task.getTaskAuthorId() != null) {
             Application.sendTelegramMsg(task.getTaskAuthorId(), message);
