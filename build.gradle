@@ -1,9 +1,12 @@
 plugins {
     id 'java'
+    id 'application'
 }
 
+mainClassName  = "net.lim.Application"
+
 group 'net.lim'
-version '0.02i'
+version '0.02.0'
 
 repositories {
     mavenCentral()
