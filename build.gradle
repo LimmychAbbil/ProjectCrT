@@ -4,6 +4,7 @@ plugins {
 }
 
 mainClassName  = "net.lim.Application"
+executableDir = "build"
 
 group 'net.lim'
 version '0.02.0'
@@ -12,6 +13,11 @@ repositories {
     mavenCentral()
 }
 
+jar {
+    manifest {
+        attributes 'Main-Class': 'net.lim.Application'
+    }
+}
 dependencies {
     compile group: 'org.telegram', name: 'telegrambots', version: '5.3.0'
     implementation group: 'org.telegram', name: 'telegrambotsextensions', version: '5.3.0'

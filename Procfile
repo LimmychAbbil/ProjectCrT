@@ -1,1 +1,1 @@
-worker: sh build/scripts/ProjectCrT
+worker: ./gradlew run
