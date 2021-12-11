@@ -1,1 +1,1 @@
-worker: ./restartScript.sh
+worker: ./gradlew --stop && ./gradlew run
